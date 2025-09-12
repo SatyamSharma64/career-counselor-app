@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import TRPCProvider from '@/components/providers/TRPCProvider'
+import TRPCProvider from '@/lib/trpc/TRPCProvider'
 import AuthProvider from '@/components/providers/AuthProvider'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { Toaster } from '@/components/ui/toaster'

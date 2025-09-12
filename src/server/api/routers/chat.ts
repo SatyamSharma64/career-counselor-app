@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
-import { createTRPCRouter, protectedProcedure } from '@/lib/trpc/server'
-import { MessageRole as Role } from '@prisma/client'
+import { createTRPCRouter, protectedProcedure } from '@/server/trpc/server'
 import { aiService } from '@/services/ai-service'
 import { MessageService } from '@/services/message-service'
 
@@ -251,7 +250,6 @@ export const chatRouter = createTRPCRouter({
   getSummary: protectedProcedure
     .input(z.object({ sessionId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id
       const messageService = new MessageService(ctx.prisma)
       
       const messages = await messageService.getConversationHistory(

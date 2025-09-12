@@ -24,7 +24,7 @@ interface State {
   toasts: ToasterToast[]
 }
 
-const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
+// const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
 // Rest of your toast implementation...
 export const reducer = (state: State, action: Action): State => {

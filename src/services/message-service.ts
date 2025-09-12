@@ -1,5 +1,4 @@
 import { PrismaClient, MessageRole } from '@prisma/client'
-import { TRPCError } from '@trpc/server'
 
 export class MessageService {
   constructor(private prisma: PrismaClient) {}

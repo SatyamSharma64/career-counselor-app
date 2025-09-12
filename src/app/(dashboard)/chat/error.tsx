@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/Button'
 import { AlertTriangle } from 'lucide-react'
 
 export default function ChatError({
-  error,
   reset,
 }: {
   error: Error & { digest?: string }

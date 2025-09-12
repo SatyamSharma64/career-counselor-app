@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '../server'
-import { openai, CAREER_COUNSELOR_PROMPT } from '../../openai'
 import { MessageRole as Role } from '@prisma/client'
+import { aiService } from '@/services/ai-service'
+import { MessageService } from '@/services/message-service'
 
 const createMessageSchema = z.object({
   content: z.string().min(1).max(4000),
@@ -37,7 +38,7 @@ export const chatRouter = createTRPCRouter({
         select: {
           id: true,
           title: true,
-          description: true,
+          // description: true,
           createdAt: true,
           updatedAt: true,
           _count: {
@@ -101,7 +102,7 @@ export const chatRouter = createTRPCRouter({
       const session = await ctx.prisma.chatSession.create({
         data: {
           title: input.title,
-          description: input.description,
+          // description: input.description,
           userId: ctx.session.user.id,
         },
       })
@@ -113,19 +114,22 @@ export const chatRouter = createTRPCRouter({
   sendMessage: protectedProcedure
     .input(createMessageSchema)
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id
+      const messageService = new MessageService(ctx.prisma)
+
+      // Validate message content
+      if (!aiService.validateMessage(input.content)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Invalid message content',
+        })
+      }
+
       // Verify session ownership
       const session = await ctx.prisma.chatSession.findFirst({
         where: {
           id: input.chatSessionId,
-          userId: ctx.session.user.id,
-        },
-        include: {
-          messages: {
-            orderBy: {
-              createdAt: 'asc',
-            },
-            take: 20, // Last 20 messages for context
-          },
+          userId,
         },
       })
 
@@ -136,76 +140,39 @@ export const chatRouter = createTRPCRouter({
         })
       }
 
+      // Get conversation history
+      const conversationHistory = await messageService.getConversationHistory(
+        input.chatSessionId
+      )
+
       // Save user message
-      const userMessage = await ctx.prisma.message.create({
-        data: {
-          content: input.content,
-          role: Role.USER,
-          chatSessionId: input.chatSessionId,
-          userId: ctx.session.user.id,
-        },
-      })
+      const userMessage = await messageService.saveUserMessage(
+        input.content,
+        input.chatSessionId
+      )
 
       try {
-        // Prepare conversation history for OpenAI
-        const messages = [
-          {
-            role: 'system' as const,
-            content: CAREER_COUNSELOR_PROMPT,
-          },
-          ...session.messages.map((msg: any) => ({
-            role: msg.role.toLowerCase() as 'user' | 'assistant',
-            content: msg.content,
-          })),
-          {
-            role: 'user' as const,
-            content: input.content,
-          },
-        ]
-
-        // Get AI response
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
-          messages,
-          max_tokens: 500,
-          temperature: 0.7,
-        })
-
-        const aiResponse = completion.choices[0]?.message?.content
-
-        if (!aiResponse) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'No response from AI',
-          })
-        }
+        // Generate AI response using the AI service
+        const aiResponse = await aiService.generateCareerAdvice(
+          input.content,
+          conversationHistory
+        )
 
         // Save AI message
-        const aiMessage = await ctx.prisma.message.create({
-          data: {
-            content: aiResponse,
-            role: Role.ASSISTANT,
-            chatSessionId: input.chatSessionId,
-            userId: ctx.session.user.id,
-          },
-        })
+        const aiMessage = await messageService.saveAssistantMessage(
+          aiResponse,
+          input.chatSessionId
+        )
 
         // Update session timestamp
-        await ctx.prisma.chatSession.update({
-          where: {
-            id: input.chatSessionId,
-          },
-          data: {
-            updatedAt: new Date(),
-          },
-        })
+        await messageService.updateSessionTimestamp(input.chatSessionId)
 
         return {
           userMessage,
           aiMessage,
         }
       } catch (error) {
-        console.error('OpenAI API Error:', error)
+        console.error('Failed to process message:', error)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to get AI response',
@@ -273,10 +240,31 @@ export const chatRouter = createTRPCRouter({
         },
         data: {
           title: input.title,
-          description: input.description,
+          // description: input.description,
         },
       })
 
       return updatedSession
+    }),
+
+  // Get conversation summary
+  getSummary: protectedProcedure
+    .input(z.object({ sessionId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id
+      const messageService = new MessageService(ctx.prisma)
+      
+      const messages = await messageService.getConversationHistory(
+        input.sessionId,
+        50 // Get more messages for summary
+      )
+
+      if (messages.length === 0) {
+        return { summary: '' }
+      }
+
+      const summary = await aiService.generateConversationSummary(messages)
+      
+      return { summary }
     }),
 })

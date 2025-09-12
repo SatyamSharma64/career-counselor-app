@@ -8,6 +8,7 @@ import {MessageBubble} from './MessageBubble'
 import {TypingIndicator} from './TypingIndicator'
 import { Send, Loader2 } from 'lucide-react'
 import { generateSessionTitle } from '@/lib/utils'
+import { ChatMessage } from '@/types/chat'
 
 interface ChatInterfaceProps {
   sessionId: string
@@ -84,11 +85,11 @@ export default function ChatInterface({ sessionId }: ChatInterfaceProps) {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             {session.title}
           </h2>
-          {session.description && (
+          {/* {session.description && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {session.description}
             </p>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -138,7 +139,7 @@ export default function ChatInterface({ sessionId }: ChatInterfaceProps) {
             </div>
           ) : (
             <>
-              {session.messages.map((msg: any) => (
+              {session.messages.map((msg: ChatMessage) => (
                 <MessageBubble
                   key={msg.id}
                   content={msg.content}

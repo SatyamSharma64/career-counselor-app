@@ -5,7 +5,7 @@ export interface ChatMessage {
   content: string
   role: Role
   createdAt: Date
-  updatedAt: Date
+  updatedAt?: Date
 }
 
 export interface ChatSession {
@@ -28,4 +28,16 @@ export interface CreateChatSessionData {
 export interface SendMessageData {
   content: string
   chatSessionId: string
+}
+
+
+export type SessionType = {
+  id: string;
+  title: string;
+  // description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  _count: {
+    messages: number;
+  };
 }

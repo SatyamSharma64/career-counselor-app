@@ -16,6 +16,8 @@ import {
   Trash2
 } from 'lucide-react'
 import { formatRelativeTime } from '@/lib/utils'
+import { SessionType } from '@/types/chat'
+
 
 export default function DashboardSidebar() {
   const pathname = usePathname()
@@ -69,7 +71,7 @@ export default function DashboardSidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-        {sessions?.sessions.map((session: any) => (
+        {sessions?.sessions.map((session: SessionType) => (
           <Link
             key={session.id}
             href={`/chat/${session.id}`}

@@ -61,8 +61,8 @@ export default async function HomePage() {
             How are you? What can I help you with today?
           </h2>
           <p className="text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
-            Whether you're starting your career, looking for a change, or seeking professional growth,
-            I'm here to provide personalized guidance tailored to your goals.
+            Whether you&apos;re starting your career, looking for a change, or seeking professional growth,
+            I&apos;m here to provide personalized guidance tailored to your goals.
           </p>
         </div>
 

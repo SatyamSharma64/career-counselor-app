@@ -13,7 +13,7 @@ import {
 
 export function ThemeToggle() {
   const [mounted, setMounted] = React.useState(false)
-  const { setTheme, theme } = useTheme()
+  const { setTheme } = useTheme()
 
   // useEffect only runs on the client, so now we can safely show the UI
   React.useEffect(() => {

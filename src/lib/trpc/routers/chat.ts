@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '../server'
-import { MessageRole as Role } from '@prisma/client'
 import { aiService } from '@/services/ai-service'
 import { MessageService } from '@/services/message-service'
 

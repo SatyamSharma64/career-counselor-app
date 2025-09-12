@@ -1,15 +1,12 @@
-import { type NextRequest } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../auth'
 import { prisma } from '../db'
 
-export async function createContext(req: NextRequest) {
+export const createTRPCContext = async () => {
   const session = await getServerSession(authOptions)
-  
+
   return {
     session,
     prisma,
   }
 }
-
-export type Context = Awaited<ReturnType<typeof createContext>>

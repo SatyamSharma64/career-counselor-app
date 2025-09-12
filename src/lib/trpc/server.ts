@@ -35,19 +35,9 @@
 // export const protectedProcedure = t.procedure.use(enforceUserIsAuthed)
 
 import { initTRPC, TRPCError } from '@trpc/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '../auth'
-import { prisma } from '../db'
 import superjson from 'superjson'
+import { createTRPCContext } from './context'
 
-export const createTRPCContext = async () => {
-  const session = await getServerSession(authOptions)
-
-  return {
-    session,
-    prisma,
-  }
-}
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

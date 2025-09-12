@@ -117,7 +117,7 @@ export default function ChatInterface({ sessionId }: ChatInterfaceProps) {
                 Start Your Career Journey
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-                I'm your AI career counselor, ready to help with career planning, job search strategies, 
+                I&apos;m your AI career counselor, ready to help with career planning, job search strategies, 
                 skill development, and professional growth. What would you like to discuss?
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">

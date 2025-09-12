@@ -110,7 +110,7 @@ export default function ProfilePage() {
                 <Input
                   id="email"
                   type="email"
-                  value={user.email}
+                  value={user.email ?? ''}
                   disabled
                   className="bg-muted"
                 />

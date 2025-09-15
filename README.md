@@ -23,6 +23,25 @@ An **AI-powered career–counseling web app** that lets users chat with a virtua
 
 ---
 
+## 📸 Screenshots
+
+### 1. Landing Page
+
+![Landing Page](./screenshots/landing-page.png)
+_Welcome page with feature overview and getting started tips_
+
+### 2. Chat Interface
+
+![Chat Interface](./screenshots/chat-interface-light.png)
+_Real-time chat with the AI career counselor_
+
+### 4. Authentication
+
+![Authentication](./screenshots/auth-page.png)
+_Secure Google OAuth authentication_
+
+---
+
 ## Features
 - Create, rename, and delete **chat sessions**  
 - **Quick Start** modal with curated conversation starters  

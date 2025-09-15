@@ -27,32 +27,3 @@ export default async function DashboardLayout({
     </div>
   )
 }
-
-
-
-
-
-// import { redirect } from 'next/navigation'
-// import { auth } from '@/lib/auth'
-// import { Navigation } from '@/components/layout/Navigation'
-
-// export default async function DashboardLayout({
-//   children,
-// }: {
-//   children: React.ReactNode
-// }) {
-//   const session = await auth()
-
-//   if (!session) {
-//     redirect('/signin')
-//   }
-
-//   return (
-//     <div className="h-screen flex overflow-hidden bg-gray-100">
-//       <Navigation />
-//       <main className="flex-1 relative overflow-y-auto focus:outline-none">
-//         {children}
-//       </main>
-//     </div>
-//   )
-// }

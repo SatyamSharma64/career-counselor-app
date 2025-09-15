@@ -3,9 +3,7 @@ import { PrismaClient, MessageRole } from '@prisma/client'
 export class MessageService {
   constructor(private prisma: PrismaClient) {}
 
-  /**
-   * Save user message to database
-   */
+  // Save user message to database
   async saveUserMessage(
     content: string,
     chatSessionId: string
@@ -20,9 +18,7 @@ export class MessageService {
     })
   }
 
-  /**
-   * Save AI assistant message to database
-   */
+  // Save AI assistant message to database
   async saveAssistantMessage(
     content: string,
     chatSessionId: string
@@ -37,9 +33,7 @@ export class MessageService {
     })
   }
 
-  /**
-   * Get conversation history for a session
-   */
+  // Get conversation history for a session
   async getConversationHistory(chatSessionId: string, limit = 20) {
     return await this.prisma.message.findMany({
       where: {
@@ -59,9 +53,21 @@ export class MessageService {
     })
   }
 
-  /**
-   * Update session timestamp
-   */
+
+  async getUserMessage(content: string, chatSessionId: string, role: MessageRole) {
+    return await this.prisma.message.findFirst({
+      where: {
+        content: content,
+        chatSessionId: chatSessionId,
+        role: MessageRole.USER,
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+  }
+
+  // Update session timestamp
   async updateSessionTimestamp(sessionId: string) {
     await this.prisma.chatSession.update({
       where: {

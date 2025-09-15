@@ -85,4 +85,5 @@ model Message {
 enum MessageRole {
   USER
   ASSISTANT
+  SYSTEM
 }

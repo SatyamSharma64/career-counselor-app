@@ -18,7 +18,7 @@ export default async function AuthLayout({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Header with Logo and Theme Toggle */}
+
       <header className="border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-2">
@@ -33,7 +33,6 @@ export default async function AuthLayout({
         </div>
       </header>
 
-      {/* Content */}
       <div className="flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full">
           <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 border border-gray-200 dark:border-gray-700">

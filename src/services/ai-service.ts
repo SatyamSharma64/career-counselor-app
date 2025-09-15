@@ -13,44 +13,117 @@ export type ConversationMessage = {
   createdAt: Date
 }
 
+
+// Helper function to check if error is an Error instance
+function isError(error: unknown): error is Error {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as any).message === 'string'
+  )
+}
+
+// Helper function to safely get error message
+function getErrorMessage(error: unknown): string {
+  if (isError(error)) {
+    return error.message
+  }
+  if (typeof error === 'string') {
+    return error
+  }
+  return 'Unknown error occurred'
+}
+
+function parseAIResponse(response: any): string {
+  console.log('Parsing AI response:', {
+    status: response.status,
+    outputCount: response.output?.length || 0,
+    error: response.error
+  })
+
+  if (!response.output || !Array.isArray(response.output)) {
+    throw new Error('Invalid response format: missing output array')
+  }
+
+  // Find the assistant message
+  const assistantMessage = response.output.find((item: any) => {
+    return item.type === 'message' && 'role' in item && item.role === 'assistant'
+  })
+
+  if (!assistantMessage) {
+    throw new Error('No assistant message found in response')
+  }
+
+  if (!('content' in assistantMessage) || !assistantMessage.content) {
+    throw new Error('Assistant message has no content')
+  }
+
+  // Check message status
+  if ('status' in assistantMessage && assistantMessage.status !== 'completed') {
+    console.warn('Assistant message not completed, status:', assistantMessage.status)
+  }
+
+  // Extract text content
+  const textContent = assistantMessage.content.find((content: any) => 
+    content.type === 'output_text'
+  )
+
+  if (!textContent?.text) {
+    throw new Error('No text content found in assistant message')
+  }
+
+  const output = textContent.text.trim()
+
+  if (!output) {
+    throw new Error('AI returned empty response text')
+  }
+
+  console.log('AI response parsed successfully:', {
+    length: output.length,
+    preview: output.slice(0, 150) + '...',
+    tokensUsed: response.usage?.total_tokens || 0
+  })
+
+  return output
+}
+
 export class AIService {
-  private readonly maxTokens = 500
+  // private readonly maxTokens = 1500
   private readonly temperature = 0.7
-  private readonly model = 'gpt-3.5-turbo'
+  private readonly model = process.env.OPENAI_MODEL || 'gpt-5-nano'
   
-  /**
-   * Generate AI response for career counseling
-   */
+  // Generate AI response for career counseling
   async generateCareerAdvice(
     userMessage: string,
     conversationHistory: ConversationMessage[] = []
   ): Promise<string> {
     try {
       const messages = this.buildConversationContext(userMessage, conversationHistory)
-      
-      const completion = await openai.chat.completions.create({
-        model: this.model,
-        messages,
-        max_tokens: this.maxTokens,
-        temperature: this.temperature,
+
+      const response = await openai.responses.create({
+          model: this.model,
+          input: messages,
+          // max_output_tokens: this.maxTokens,
+          // temperature: this.temperature
+      });
+
+      console.log('OpenAI response structure:', {
+        status: response.status,
+        outputCount: response.output?.length || 0,
+        error: response.error,
+        model: response.model
       })
 
-      const response = completion.choices[0]?.message?.content
+      return parseAIResponse(response)
 
-      if (!response) {
-        throw new Error('No response received from AI')
-      }
-
-      return response.trim()
-    } catch (error) {
-      console.error('AI Service Error:', error)
-      throw new Error('Failed to generate AI response')
+    } catch (error: unknown) {
+      console.error('AI Service Error:', getErrorMessage(error))
+      throw new Error(`AI service error: ${getErrorMessage(error)}`)
     }
   }
 
-  /**
-   * Build conversation context for OpenAI
-   */
+  // Build conversation context for LLM
   private buildConversationContext(
     userMessage: string,
     conversationHistory: ConversationMessage[]
@@ -80,9 +153,7 @@ export class AIService {
     return messages
   }
 
-  /**
-   * Validate message content
-   */
+  // Validate message content
   validateMessage(content: string): boolean {
     if (!content || content.trim().length === 0) {
       return false
@@ -95,9 +166,8 @@ export class AIService {
     return true
   }
 
-  /**
-   * Get conversation summary (useful for very long conversations)
-   */
+
+  // Get conversation summary (useful for very long conversations)
   async generateConversationSummary(messages: ConversationMessage[]): Promise<string> {
     if (messages.length === 0) return ''
 
@@ -106,29 +176,53 @@ export class AIService {
       .join('\n')
 
     try {
-      const completion = await openai.chat.completions.create({
+      const summaryInput = [
+        {
+          role: 'system' as const,
+          content: [
+            {
+              type: 'input_text' as const,
+              text: 'You are a helpful assistant that creates concise summaries of career counseling conversations. Summarize the key topics discussed and main advice given in 2-3 sentences.',
+            }
+          ]
+        },
+        {
+          role: 'user' as const,
+          content: [
+            {
+              type: 'input_text' as const,
+              text: `Please summarize this career counseling conversation:\n\n${conversationText}`,
+            }
+          ]
+        }
+      ]
+
+      const response = await openai.responses.create({
         model: this.model,
-        messages: [
-          {
-            role: 'system',
-            content: 'Summarize this career counseling conversation in 2-3 sentences, focusing on key topics discussed and advice given.',
-          },
-          {
-            role: 'user',
-            content: conversationText,
-          },
-        ],
-        max_tokens: 150,
+        input: summaryInput,
+        max_output_tokens: 200,
         temperature: 0.3,
       })
 
-      return completion.choices[0]?.message?.content?.trim() || ''
+      return parseAIResponse(response)
+
     } catch (error) {
       console.error('Failed to generate summary:', error)
       return ''
     }
   }
+
+  async continueResponse(previousResponse: string, userMessage: string): Promise<string> {
+    const continuePrompt = `Please continue your previous response that was cut off. 
+
+Previous response: "${previousResponse.slice(-200)}..."
+
+Original question: "${userMessage}"
+
+Please continue from where you left off and provide a complete answer.`
+
+    return this.generateCareerAdvice(continuePrompt, [])
+  }
 }
 
-// Export singleton instance
 export const aiService = new AIService()

@@ -3,10 +3,12 @@ import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '@/server/trpc/server'
 import { aiService } from '@/services/ai-service'
 import { MessageService } from '@/services/message-service'
+import { MessageRole } from '@prisma/client'
 
 const createMessageSchema = z.object({
   content: z.string().min(1).max(4000),
   chatSessionId: z.string(),
+  isRetry: z.boolean().default(false),
 })
 
 const createSessionSchema = z.object({
@@ -94,6 +96,65 @@ export const chatRouter = createTRPCRouter({
       return session
     }),
 
+  getSessionMessages: protectedProcedure
+    .input(z.object({ 
+      sessionId: z.string(),
+      limit: z.number().min(1).max(50).default(20),
+      cursor: z.string().nullish(), // message ID to start from
+    }))
+    .query(async ({ ctx, input }) => {
+      const session = await ctx.prisma.chatSession.findFirst({
+        where: {
+          id: input.sessionId,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      if (!session) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Chat session not found',
+        });
+      }
+
+      const messages = await ctx.prisma.message.findMany({
+        where: {
+          chatSessionId: input.sessionId,
+        },
+        orderBy: {
+          createdAt: 'desc', // Get newest first for cursor pagination
+        },
+        take: input.limit + 1, // Take one extra to check if there are more
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+        select: {
+          id: true,
+          content: true,
+          role: true,
+          createdAt: true,
+        },
+      });
+
+      let nextCursor: typeof input.cursor | undefined = undefined;
+      if (messages.length > input.limit) {
+        const nextItem = messages.pop();
+        nextCursor = nextItem?.id;
+      }
+
+      // Reverse to show oldest first in UI
+      const reversedMessages = messages.reverse();
+
+      return {
+        messages: reversedMessages,
+        nextCursor,
+        hasMore: !!nextCursor,
+        session: {
+          id: session.id,
+          title: session.title,
+          createdAt: session.createdAt,
+        }
+      };
+    }),
+
   // Create a new chat session
   createSession: protectedProcedure
     .input(createSessionSchema)
@@ -144,11 +205,26 @@ export const chatRouter = createTRPCRouter({
         input.chatSessionId
       )
 
-      // Save user message
-      const userMessage = await messageService.saveUserMessage(
-        input.content,
-        input.chatSessionId
-      )
+      let userMessage;
+
+      if(!input.isRetry){
+        // Save user message
+        userMessage = await messageService.saveUserMessage(
+          input.content,
+          input.chatSessionId
+        )
+        console.log('user message:', userMessage?.id)
+
+      } else {
+        // For retries, find the existing user message
+        userMessage = await messageService.getUserMessage(
+          input.content, 
+          input.chatSessionId, 
+          MessageRole.USER
+        )
+
+        console.log('Found existing user message for retry:', userMessage?.id)
+      }
 
       try {
         // Generate AI response using the AI service

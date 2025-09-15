@@ -26,14 +26,14 @@ export function formatRelativeTime(date: Date | string) {
   return formatDate(date)
 }
 
-export function generateSessionTitle(firstMessage: string): string {
-  // Extract first few words to create a meaningful title
-  const words = firstMessage.trim().split(/\s+/).slice(0, 6)
-  let title = words.join(" ")
+// export function generateSessionTitle(firstMessage: string): string {
+//   // Extract first few words to create a meaningful title
+//   const words = firstMessage.trim().split(/\s+/).slice(0, 6)
+//   let title = words.join(" ")
   
-  if (title.length > 50) {
-    title = title.substring(0, 47) + "..."
-  }
+//   if (title.length > 50) {
+//     title = title.substring(0, 47) + "..."
+//   }
   
-  return title || "New Chat"
-}
+//   return title || "New Chat"
+// }

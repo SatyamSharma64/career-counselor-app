@@ -15,7 +15,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Header with Theme Toggle */}
+
       <header className="border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
@@ -55,7 +55,6 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Rest of your homepage content */}
         <div className="text-center mb-12">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
             How are you? What can I help you with today?

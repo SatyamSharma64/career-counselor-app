@@ -1,9 +1,8 @@
 @import "tailwindcss";
 
-/* CRITICAL: Define the custom dark variant */
+
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Define base theme variables */
 @theme {
   --color-background: #ffffff;
   --color-foreground: #0f172a;
@@ -26,7 +25,6 @@
   --color-ring: #3b82f6;
 }
 
-/* CRITICAL: Dark mode variables must be in @layer theme */
 @layer theme {
   .dark {
     --color-background: #0f172a;
@@ -53,25 +51,22 @@
 
 @layer base {
   * {
-    border-color: theme(colors.border);
+    border-color: var(--color-border);
   }
   body {
-    background-color: theme(colors.background);
-    color: theme(colors.foreground);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
     font-family: inherit;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
-
   h1, h2, h3, h4, h5, h6 {
-    color: theme(colors.foreground);
+    color: var(--color-foreground);
   }
-
   p {
-    color: theme(colors.foreground);
+    color: var(--color-foreground);
   }
 }
 
-/* Custom scrollbar */
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: rgb(203 213 225) transparent;

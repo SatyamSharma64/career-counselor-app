@@ -12,7 +12,6 @@ type ToasterToast = ToastProps & {
   action?: ToastActionElement
 }
 
-// Remove unused actionTypes
 type Action =
   | { type: "ADD_TOAST"; toast: ToasterToast }
   | { type: "UPDATE_TOAST"; toast: Partial<ToasterToast> }
@@ -23,9 +22,6 @@ interface State {
   toasts: ToasterToast[]
 }
 
-// const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
-
-// Rest of your toast implementation...
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "ADD_TOAST":

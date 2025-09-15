@@ -47,7 +47,6 @@ export default function SignInPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="text-center">
         <div className="flex justify-center mb-4">
           <div className="bg-blue-600 p-3 rounded-xl">
@@ -62,7 +61,6 @@ export default function SignInPage() {
         </p>
       </div>
 
-      {/* OAuth Providers */}
       <div className="space-y-3">
         <Button
           onClick={() => handleOAuthSignIn('google')}
@@ -93,7 +91,6 @@ export default function SignInPage() {
         </Button>
       </div>
 
-      {/* Divider */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-300 dark:border-gray-600" />
@@ -105,7 +102,6 @@ export default function SignInPage() {
         </div>
       </div>
 
-      {/* Email Form */}
       <form onSubmit={handleEmailSignIn} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -134,7 +130,6 @@ export default function SignInPage() {
         </Button>
       </form>
 
-      {/* Footer Links */}
       <div className="text-center space-y-4">
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Don&apos;t have an account?{' '}

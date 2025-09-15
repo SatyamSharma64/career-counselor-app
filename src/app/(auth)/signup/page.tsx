@@ -22,7 +22,6 @@ export default function SignUpPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="text-center">
         <div className="flex justify-center mb-4">
           <div className="bg-blue-600 p-3 rounded-xl">
@@ -37,7 +36,6 @@ export default function SignUpPage() {
         </p>
       </div>
 
-      {/* OAuth Providers */}
       <div className="space-y-4">
         <Button
           variant="outline"
@@ -60,7 +58,6 @@ export default function SignUpPage() {
         </Button>
       </div>
 
-      {/* Footer Links */}
       <div className="text-center space-y-4">
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Already have an account?{' '}

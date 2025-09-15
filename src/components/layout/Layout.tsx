@@ -13,7 +13,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
-    // In a real app, you'd persist this to localStorage and apply the theme
     document.documentElement.classList.toggle("dark");
   };
 

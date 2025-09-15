@@ -12,7 +12,7 @@ export function useChat(sessionId?: string) {
 
   const sendMessageMutation = trpc.chat.sendMessage.useMutation()
 
-  const sendMessage = useCallback(async (content: string) => {
+  const sendMessage = useCallback(async (content: string, isRetry: boolean) => {
     if (!sessionId) return
 
     setIsLoading(true)
@@ -22,6 +22,7 @@ export function useChat(sessionId?: string) {
       await sendMessageMutation.mutateAsync({
         content,
         chatSessionId: sessionId,
+        isRetry,
       })
       await refetch()
     } catch (err) {

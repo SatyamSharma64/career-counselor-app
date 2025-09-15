@@ -38,7 +38,7 @@ _Real-time chat with the AI career counselor_
 ### 4. Authentication
 
 ![Authentication](./screenshots/auth-page.png)
-_Secure Google OAuth authentication_
+_Secure Google and Github OAuth authentication_
 
 ---
 

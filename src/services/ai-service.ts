@@ -13,6 +13,31 @@ export type ConversationMessage = {
   createdAt: Date
 }
 
+// interface AIResponseOutput {
+//   type: string;
+//   role?: string;
+//   content?: Array<{
+//     type: string;
+//     text?: string;
+//   }>;
+//   status?: string;
+// }
+
+// interface AIResponse {
+//   status?: string;
+//   output?: AIResponseOutput[];
+//   error?: string;
+//   model?: string;
+//   usage?: {
+//     total_tokens?: number;
+//   };
+// }
+
+// interface ContentItem {
+//   type: string;
+//   text?: string;
+// }
+
 
 // Helper function to check if error is an Error instance
 function isError(error: unknown): error is Error {
@@ -20,7 +45,7 @@ function isError(error: unknown): error is Error {
     typeof error === 'object' &&
     error !== null &&
     'message' in error &&
-    typeof (error as any).message === 'string'
+    typeof (error as Record<string, unknown>).message === 'string'
   )
 }
 
@@ -35,62 +60,62 @@ function getErrorMessage(error: unknown): string {
   return 'Unknown error occurred'
 }
 
-function parseAIResponse(response: any): string {
-  console.log('Parsing AI response:', {
-    status: response.status,
-    outputCount: response.output?.length || 0,
-    error: response.error
-  })
+// function parseAIResponse(response: AIResponse): string {
+//   console.log('Parsing AI response:', {
+//     status: response.status,
+//     outputCount: response.output?.length || 0,
+//     error: response.error
+//   })
 
-  if (!response.output || !Array.isArray(response.output)) {
-    throw new Error('Invalid response format: missing output array')
-  }
+//   if (!response.output || !Array.isArray(response.output)) {
+//     throw new Error('Invalid response format: missing output array')
+//   }
 
-  // Find the assistant message
-  const assistantMessage = response.output.find((item: any) => {
-    return item.type === 'message' && 'role' in item && item.role === 'assistant'
-  })
+//   // Find the assistant message
+//   const assistantMessage = response.output.find((item: AIResponseOutput) => {
+//     return item.type === 'message' && 'role' in item && item.role === 'assistant'
+//   })
 
-  if (!assistantMessage) {
-    throw new Error('No assistant message found in response')
-  }
+//   if (!assistantMessage) {
+//     throw new Error('No assistant message found in response')
+//   }
 
-  if (!('content' in assistantMessage) || !assistantMessage.content) {
-    throw new Error('Assistant message has no content')
-  }
+//   if (!('content' in assistantMessage) || !assistantMessage.content) {
+//     throw new Error('Assistant message has no content')
+//   }
 
-  // Check message status
-  if ('status' in assistantMessage && assistantMessage.status !== 'completed') {
-    console.warn('Assistant message not completed, status:', assistantMessage.status)
-  }
+//   // Check message status
+//   if ('status' in assistantMessage && assistantMessage.status !== 'completed') {
+//     console.warn('Assistant message not completed, status:', assistantMessage.status)
+//   }
 
-  // Extract text content
-  const textContent = assistantMessage.content.find((content: any) => 
-    content.type === 'output_text'
-  )
+//   // Extract text content
+//   const textContent = assistantMessage.content.find((content: ContentItem) => 
+//     content.type === 'output_text'
+//   )
 
-  if (!textContent?.text) {
-    throw new Error('No text content found in assistant message')
-  }
+//   if (!textContent?.text) {
+//     throw new Error('No text content found in assistant message')
+//   }
 
-  const output = textContent.text.trim()
+//   const output = textContent.text.trim()
 
-  if (!output) {
-    throw new Error('AI returned empty response text')
-  }
+//   if (!output) {
+//     throw new Error('AI returned empty response text')
+//   }
 
-  console.log('AI response parsed successfully:', {
-    length: output.length,
-    preview: output.slice(0, 150) + '...',
-    tokensUsed: response.usage?.total_tokens || 0
-  })
+//   console.log('AI response parsed successfully:', {
+//     length: output.length,
+//     preview: output.slice(0, 150) + '...',
+//     tokensUsed: response.usage?.total_tokens || 0
+//   })
 
-  return output
-}
+//   return output
+// }
 
 export class AIService {
   // private readonly maxTokens = 1500
-  private readonly temperature = 0.7
+  // private readonly temperature = 0.7
   private readonly model = process.env.OPENAI_MODEL || 'gpt-5-nano'
   
   // Generate AI response for career counseling
@@ -115,7 +140,7 @@ export class AIService {
         model: response.model
       })
 
-      return parseAIResponse(response)
+      return response.output_text //parseAIResponse(response)
 
     } catch (error: unknown) {
       console.error('AI Service Error:', getErrorMessage(error))
@@ -204,7 +229,7 @@ export class AIService {
         temperature: 0.3,
       })
 
-      return parseAIResponse(response)
+      return response.output_text //parseAIResponse(response)
 
     } catch (error) {
       console.error('Failed to generate summary:', error)

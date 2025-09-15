@@ -3,7 +3,6 @@ import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '@/server/trpc/server'
 import { aiService } from '@/services/ai-service'
 import { MessageService } from '@/services/message-service'
-import { MessageRole } from '@prisma/client'
 
 const createMessageSchema = z.object({
   content: z.string().min(1).max(4000),
@@ -219,8 +218,7 @@ export const chatRouter = createTRPCRouter({
         // For retries, find the existing user message
         userMessage = await messageService.getUserMessage(
           input.content, 
-          input.chatSessionId, 
-          MessageRole.USER
+          input.chatSessionId
         )
 
         console.log('Found existing user message for retry:', userMessage?.id)

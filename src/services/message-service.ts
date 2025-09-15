@@ -54,7 +54,7 @@ export class MessageService {
   }
 
 
-  async getUserMessage(content: string, chatSessionId: string, role: MessageRole) {
+  async getUserMessage(content: string, chatSessionId: string) {
     return await this.prisma.message.findFirst({
       where: {
         content: content,

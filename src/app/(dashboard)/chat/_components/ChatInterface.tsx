@@ -106,7 +106,7 @@ export default function ChatInterface({ sessionId }: ChatInterfaceProps) {
     }
   })
 
-  const updateSession = trpc.chat.updateSession.useMutation()
+  // const updateSession = trpc.chat.updateSession.useMutation()
 
   // Pagination scrolling
   const scrollToBottom = () => {

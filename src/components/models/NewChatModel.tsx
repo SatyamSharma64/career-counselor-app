@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { X } from "lucide-react";
@@ -20,10 +20,10 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ isOpen, onClose, onC
     }
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setTitle('');
     onClose();
-  };
+  }, [onClose]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -43,7 +43,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ isOpen, onClose, onC
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen]);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 

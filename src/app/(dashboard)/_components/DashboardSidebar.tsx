@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils/cn'
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
 import { trpc } from '@/lib/trpc/client'
 import { useToast } from '@/hooks/use-toast'
 import { 
@@ -28,7 +27,10 @@ interface SessionItemProps {
   session: SessionType;
   isActive: boolean;
   onDelete: (sessionId: string) => void;
-  deleteSessionMutation: any;
+  deleteSessionMutation: {
+    isPending: boolean;
+    mutateAsync: (variables: { sessionId: string }) => Promise<unknown>;
+  };
 }
 
 const SessionItem: React.FC<SessionItemProps> = ({ 
